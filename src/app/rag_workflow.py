@@ -92,5 +92,3 @@ graph_builder.add_edge("augmentation", "generation")
 graph_builder.add_edge("generation", END)
 
 graph = graph_builder.compile()
-
-graph.invoke({"query": "who am i?"})

@@ -17,12 +17,15 @@ EVALUATION_DATA_DIR = ROOT_DIR / "data" / "evaluation" / "eval_dataset"
 EVALUATION_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 # evaluation dataset
-dataset = EvaluationDataset()
+golden_dataset = EvaluationDataset()
 # add goldens to dataset
-dataset.add_goldens_from_json_file(file_path=GOLDENS_PATH)
+golden_dataset.add_goldens_from_json_file(file_path=GOLDENS_PATH)
+
+# dataset to hold produced test cases
+eval_dataset = EvaluationDataset()
 
 # invoke our application
-for golden in dataset.goldens:
+for count, golden in enumerate(golden_dataset.goldens, 1):
     final_state = graph.invoke({"query": golden.input})
     sleep(3)
     test_case = LLMTestCase(
@@ -31,10 +34,11 @@ for golden in dataset.goldens:
         expected_output=golden.expected_output,
         retrieval_context=[doc.page_content for doc in final_state.get("retrieved_docs")]
     )
-    dataset.add_test_case(test_case = test_case)
+    eval_dataset.add_test_case(test_case = test_case)
 
 # save the dataset along with test cases
-dataset.save_as(file_type="json",
+eval_dataset.save_as(file_type="json",
                 directory=EVALUATION_DATA_DIR,
+                # file_name="evaluation_dataset",
                 file_name="evaluation_dataset_deepseek",
                 include_test_cases=True)            # if False goldens will be saved not test cases

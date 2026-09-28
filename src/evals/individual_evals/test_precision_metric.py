@@ -35,8 +35,8 @@ test_case = LLMTestCase(
 )
 
 # metric
-recall_metric = ContextualPrecisionMetric(verbose_mode=True,
+precision_metric = ContextualPrecisionMetric(verbose_mode=True,
                                        model=deepseek_model)
 
 # test the metric
-recall_metric.measure(test_case=test_case)
+precision_metric.measure(test_case=test_case)

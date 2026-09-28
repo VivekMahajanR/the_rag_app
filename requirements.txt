@@ -9,3 +9,4 @@ streamlit
 python-dotenv
 langgraph
 ipykernel
+langfuse
