@@ -74,12 +74,23 @@ if DATASET_PATH.exists():
         file_path=DATASET_PATH,
         input_key_name="input",
         actual_output_key_name="actual_output",
-        expected_outcome_key_name="expected_output",
+        expected_output_key_name="expected_output",
         retrieval_context_key_name="retrieval_context"
     )
 
     # store the test cases in a list
-    test_cases = dataset.test_cases
+    # test_cases = dataset.test_cases
+    
+    # Convert goldens into LLMTestCase instances
+    test_cases = []
+    for golden in dataset.goldens:
+        test_case = LLMTestCase(
+            input=golden.input,
+            actual_output=golden.actual_output,
+            expected_output=golden.expected_output,
+            retrieval_context=golden.retrieval_context
+        )
+        test_cases.append(test_case)
 
     # evaluate the dataset
     evaluate(test_cases=test_cases,
@@ -93,5 +104,7 @@ if DATASET_PATH.exists():
                  simple_explaination
              ], 
              async_config=AsyncConfig(throttle_value=3, max_concurrent=5),
-             display_config=DisplayConfig(results_folder=(ROOT_DIR),
-                                          file_output_dir=(ROOT_DIR)),)
+             display_config=DisplayConfig(results_folder=(ROOT_DIR / "reports" / "evaluation_results").as_posix(),
+                                          file_type="md",
+                                          file_output_dir=(ROOT_DIR / "reports" / "evaluation_report").as_posix())
+    )

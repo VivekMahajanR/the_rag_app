@@ -35,3 +35,9 @@ created_prompt = langfuse.create_prompt(
 print(created_prompt.prompt)
 print(created_prompt.version)
 print(created_prompt.labels)
+
+# langfuse.update_prompt(
+#     name="the_rag_app_system_prompt",
+#     version=1,
+#     new_labels=["production"]
+# )
