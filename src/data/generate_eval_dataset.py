@@ -36,9 +36,36 @@ for count, golden in enumerate(golden_dataset.goldens, 1):
     )
     eval_dataset.add_test_case(test_case = test_case)
 
+<<<<<<< Updated upstream
 # save the dataset along with test cases
 eval_dataset.save_as(file_type="json",
                 directory=EVALUATION_DATA_DIR,
                 # file_name="evaluation_dataset",
                 file_name="evaluation_dataset_deepseek",
                 include_test_cases=True)            # if False goldens will be saved not test cases
+=======
+    # dataset to hold produced test cases
+    eval_dataset = EvaluationDataset()
+
+    # invoke our application
+    for count, golden in enumerate(golden_dataset.goldens, 1):
+        final_state = graph.invoke({"query": golden.input})
+        # sleep(3)
+        test_case = LLMTestCase(
+            input = golden.input,
+            actual_output=final_state.get("response"),
+            expected_output=golden.expected_output,
+            retrieval_context=[doc.page_content for doc in final_state.get("retrieved_docs")]
+        )
+        eval_dataset.add_test_case(test_case = test_case)
+        logger.log(level=INFO, msg= f"Added test case no. {count}")
+
+    # save the dataset along with test cases
+    eval_dataset.save_as(file_type="json",
+                    directory=EVALUATION_DATA_DIR,
+                    file_name=evaluation_dataset_params.evaluation_dataset_filename,
+                    include_test_cases=True)            # if False goldens will be saved not test cases
+
+if __name__ == "__main__":
+    generate_evaluation_dataset()
+>>>>>>> Stashed changes

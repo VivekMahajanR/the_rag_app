@@ -92,3 +92,12 @@ graph_builder.add_edge("augmentation", "generation")
 graph_builder.add_edge("generation", END)
 
 graph = graph_builder.compile()
+
+# result = graph.invoke({"query": "How does golden synthesizer generate context-grounded RAG goldens from transcripts to minimize hallucinations?"})
+
+# print(result['query'])
+# print(result['retrieved_docs'])
+# print(result['context'])
+# print(result['response'])
+
+
