@@ -17,20 +17,6 @@ from app.clients import app_params, logger, REPO_ROOT
 PROCESSED_TRANSCRIPTS_DIR = REPO_ROOT / "data" / "processed"
 VECTOR_STORE_DIR = REPO_ROOT / "saved-embeddings"
 
-# ROOT_PATH = Path(__file__).parent.parent.parent
-# DOCS_PATH = ROOT_PATH / "data" / "processed"
-# EMBEDDING_PATH = ROOT_PATH / "saved-embeddings"
-
-# loader = DirectoryLoader(path=Path(DOCS_PATH).as_posix(),
-#                          loader_cls=TextLoader,
-#                          show_progress=True)
-
-# docs = loader.load()
-
-# chunker = RecursiveCharacterTextSplitter(chunk_size = app_params.chunk_size,
-#                                          chunk_overlap = app_params.chunk_overlap)
-
-# chunks = chunker.split_documents(docs)
 
 embedder = OpenAIEmbeddings(model=app_params.embedding_model,
                  dimensions=app_params.embedding_dimensions)
@@ -48,7 +34,7 @@ logger.info(f"Embedding Dimension: {app_params.embedding_dimensions}")
 # upsert_documents() below is explicitly called, which is wired up to run
 # only from the admin API (src/api/routers/vector_store.py), never as a
 # side effect of importing this module or the RAG graph that depends on it.
-vs = Chroma(collection_name='rag_demo',
+vs = Chroma(collection_name=app_params.collection_name,
             embedding_function=embedder,
             persist_directory=(VECTOR_STORE_DIR).as_posix())
 
@@ -83,7 +69,7 @@ def upsert_documents(chunk_size: int, chunk_overlap: int) -> dict:
         file_chunks = chunker.split_documents([doc])
 
         if not file_chunks:
-            skipped_files.append(file_path)
+            skipped_files.append(file_path.name)
             continue
 
         candidate_ids = [f"{file_path.name}::{i}" for i in range(len(file_chunks))]
@@ -99,21 +85,21 @@ def upsert_documents(chunk_size: int, chunk_overlap: int) -> dict:
             to_embed_chunks.append(chunk)
             to_embed_ids.append(chunk_id)
 
-        if to_embed_chunks:
-            vs.add_documents(to_embed_chunks, ids= to_embed_ids)
+    if to_embed_chunks:
+        vs.add_documents(to_embed_chunks, ids= to_embed_ids)
 
-        logger.info(
-            f"Transcript upsert: scanned {len(files)} files,"
-            f"embedded {len(to_embed_chunks)} new/changed chunks, "
-            f"{len(skipped_files)} files unreadable/empty"
-        )
+    logger.info(
+        f"Transcript upsert: scanned {len(files)} files,"
+        f"embedded {len(to_embed_chunks)} new/changed chunks, "
+        f"{len(skipped_files)} files unreadable/empty"
+    )
 
-        return{
-            "files_scanned": len(files),
-            "files_ingested": len(files) - len(skipped_files),
-            "chunks_added": len(to_embed_chunks),
-            "skipped_files": skipped_files
-        }
+    return{
+        "files_scanned": len(files),
+        "files_ingested": len(files) - len(skipped_files),
+        "chunks_added": len(to_embed_chunks),
+        "skipped_files": skipped_files
+    }
 
 # upsert_documents(chunk_size, chunk_overlap)
 

@@ -1,22 +1,27 @@
-from langchain_community.document_loaders import TextLoader, DirectoryLoader
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain_openrouter import ChatOpenRouter
+
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.documents import Document
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_chroma import Chroma
 from langchain_core.output_parsers import StrOutputParser
-from pathlib import Path
 from dotenv import load_dotenv
 from langgraph.graph import StateGraph, START, END
 from typing import Literal, TypedDict
-import os
+from langfuse import get_client
+
+from app.clients import app_params, llm
+from app.vector_store import get_retriever
 
 load_dotenv()
 
-ROOT_PATH = Path(__file__).parent.parent.parent
-DOCS_PATH = ROOT_PATH / "data" / "processed"
-EMBEDDING_PATH = ROOT_PATH / "saved-embeddings"
+# langfuse client
+langfuse = get_client()
+
+# load system prompt
+system_prompt = langfuse.get_prompt(
+    name="the_rag_app_system_prompt",
+    type="text",
+    label=app_params.prompt_label
+)
+
 class RAGState(TypedDict):
 
     query: str
@@ -25,34 +30,9 @@ class RAGState(TypedDict):
     prompt: ChatPromptTemplate
     response: str
 
-# llm = ChatOpenAI(model = "gpt-4o-mini")
-llm = ChatOpenRouter(model="deepseek/deepseek-v4-flash-0731",
-                     api_key=os.environ["OPENROUTER_API_KEY"])
-
-embedder = OpenAIEmbeddings(model = "text-embedding-3-small", dimensions=1024)
-
-loader = DirectoryLoader(path=Path(DOCS_PATH).as_posix(),
-                         loader_cls=TextLoader,
-                         show_progress=True)
-
-docs = loader.load()
-
-chunker = RecursiveCharacterTextSplitter(chunk_size = 500,
-                                         chunk_overlap = 50)
-
-chunks = chunker.split_documents(docs)
-
-vs = Chroma(collection_name='rag_demo',
-            embedding_function=embedder,
-            persist_directory=Path(EMBEDDING_PATH).as_posix())
-
-vs.add_documents(chunks)
-
-retriever = vs.as_retriever(search_kwargs = {'k':3},search_type = 'similarity')
-
 def retrieve(state: RAGState) -> dict:
     query = state["query"]
-
+    retriever = get_retriever()
     retrieved_docs = retriever.invoke(query)
 
     context = "\n\n".join([doc.page_content for doc in retrieved_docs])
@@ -61,13 +41,12 @@ def retrieve(state: RAGState) -> dict:
 def augmentation(state: RAGState) -> dict:
 
     prompt = ChatPromptTemplate.from_messages([
-        ("system", """You are a helpful assistant. Answer the user query
-                      based on the given context only. If you do not know the answer
-                      say I don't know. Do not add any preamble to the response"""),
+        ("system", system_prompt.prompt),
         ("human", "context: {context}\n\nquery: {query}")
     ])
     
     return {"prompt": prompt}
+
 
 def generation(state: RAGState) -> dict:
 

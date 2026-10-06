@@ -11,32 +11,39 @@ from deepeval.test_case import LLMTestCase
 from deepeval.metrics.g_eval import Rubric
 from deepeval.test_case.llm_test_case import SingleTurnParams
 from deepeval.models import OpenRouterModel
+from deepeval.models import OpenAIModel
 from deepeval.dataset.dataset import EvaluationDataset
 from deepeval.evaluate.configs import AsyncConfig, DisplayConfig
 from pathlib import Path
 from dotenv import load_dotenv
 import os
 
+from config.parameter_config import params_config
+
+# load the evaluation params
+evaluation_params = params_config.evaluation
+async_params = evaluation_params.async_config
+display_params = evaluation_params.display_config
+evaluation_dataset_params = params_config.evaluation_dataset
+
 # load the api key
 load_dotenv()
 
-deepseek_model = OpenRouterModel(
-    model="deepseek/deepseek-v4-flash-0731",
-    api_key=os.environ["OPENROUTER_API_KEY"]
-)
+
+model = OpenAIModel(model="gpt-5-mini")
 
 # define the metrics
-recall = ContextualRecallMetric(model=deepseek_model)
-precision = ContextualPrecisionMetric(model=deepseek_model)
-contextual_relevacy = ContextualRelevancyMetric(model=deepseek_model)
-answer_relevancy = AnswerRelevancyMetric(model=deepseek_model)
-faithfulness = FaithfulnessMetric(model=deepseek_model,
+recall = ContextualRecallMetric(model=model)
+precision = ContextualPrecisionMetric(model=model)
+contextual_relevacy = ContextualRelevancyMetric(model=model)
+answer_relevancy = AnswerRelevancyMetric(model=model)
+faithfulness = FaithfulnessMetric(model=model,
                                   truths_extraction_limit=5,
                                   penalize_ambiguous_claims=True)
 
 # define the custom metrics
 answer_correctness = GEval(
-    model=deepseek_model,
+    model=model,
     name = "answer_correctness",
     evaluation_params=[SingleTurnParams.EXPECTED_OUTPUT, SingleTurnParams.ACTUAL_OUTPUT],
     criteria="""Evaluate the LLM response based on correctness of answer. Compare the 'expected_output' with the 'actual_output'. Penalize wrong facts strictly""",
@@ -45,7 +52,7 @@ answer_correctness = GEval(
             Rubric(score_range=(10, 10), expected_outcome=r"100% correct")]
 )
 
-simple_explaination = GEval(model=deepseek_model,
+simple_explaination = GEval(model=model,
     name = "simple_explaination",
     evaluation_params=[SingleTurnParams.INPUT, SingleTurnParams.ACTUAL_OUTPUT],
     evaluation_steps=[
@@ -61,50 +68,56 @@ simple_explaination = GEval(model=deepseek_model,
     ]   
 )
 
-# define the evaluation dataset path
-ROOT_DIR = Path(__file__).parent.parent.parent.parent
-DATASET_PATH = (ROOT_DIR / "data" / "evaluation" / "eval_dataset" / "evaluation_dataset").with_suffix(".json")
+def evaluate_app():
 
-if DATASET_PATH.exists():
-    # load the dataset
-    dataset = EvaluationDataset()
+    # define the evaluation dataset path
+    ROOT_DIR = Path(__file__).parent.parent.parent.parent
+    DATASET_PATH = (ROOT_DIR / "data" / "evaluation" / "eval_dataset" / evaluation_dataset_params.evaluation_dataset_filename).with_suffix(".json")
 
-    # load the test cases
-    dataset.add_goldens_from_json_file(
-        file_path=DATASET_PATH,
-        input_key_name="input",
-        actual_output_key_name="actual_output",
-        expected_output_key_name="expected_output",
-        retrieval_context_key_name="retrieval_context"
-    )
+    if DATASET_PATH.exists():
+        # load the dataset
+        dataset = EvaluationDataset()
 
-    # store the test cases in a list
-    # test_cases = dataset.test_cases
-    
-    # Convert goldens into LLMTestCase instances
-    test_cases = []
-    for golden in dataset.goldens:
-        test_case = LLMTestCase(
-            input=golden.input,
-            actual_output=golden.actual_output,
-            expected_output=golden.expected_output,
-            retrieval_context=golden.retrieval_context
+        # load the test cases
+        dataset.add_goldens_from_json_file(
+            file_path=DATASET_PATH,
+            input_key_name="input",
+            actual_output_key_name="actual_output",
+            expected_output_key_name="expected_output",
+            retrieval_context_key_name="retrieval_context"
         )
-        test_cases.append(test_case)
 
-    # evaluate the dataset
-    evaluate(test_cases=test_cases,
-             metrics=[
-                 recall,
-                 precision,
-                 answer_relevancy,
-                 faithfulness,
-                 contextual_relevacy,
-                 answer_correctness,
-                 simple_explaination
-             ], 
-             async_config=AsyncConfig(throttle_value=3, max_concurrent=5),
-             display_config=DisplayConfig(results_folder=(ROOT_DIR / "reports" / "evaluation_results").as_posix(),
-                                          file_type="md",
-                                          file_output_dir=(ROOT_DIR / "reports" / "evaluation_report").as_posix())
-    )
+        # store the test cases in a list
+        # test_cases = dataset.test_cases
+        
+        # Convert goldens into LLMTestCase instances
+        test_cases = []
+        for golden in dataset.goldens:
+            test_case = LLMTestCase(
+                input=golden.input,
+                actual_output=golden.actual_output,
+                expected_output=golden.expected_output,
+                retrieval_context=golden.retrieval_context
+            )
+            test_cases.append(test_case)
+
+        # evaluate the dataset
+        evaluate(test_cases=test_cases,
+                metrics=[
+                    recall,
+                    precision,
+                    answer_relevancy,
+                    faithfulness,
+                    contextual_relevacy,
+                    answer_correctness,
+                    simple_explaination
+                ], 
+                async_config=AsyncConfig(throttle_value=async_params.throttle_value,
+                                        max_concurrent=async_params.max_concurrent),
+                display_config=DisplayConfig(results_folder=(ROOT_DIR / "reports" / display_params.results_dir).as_posix(),
+                                            file_type="md",
+                                            file_output_dir=(ROOT_DIR / "reports" / display_params.report_dir).as_posix())
+        )
+
+if __name__ == "__main__":
+    evaluate_app()

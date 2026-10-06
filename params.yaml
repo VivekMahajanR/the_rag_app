@@ -1,8 +1,9 @@
 # application parameters
 rag_app:
   prompt_label: staging
-  # llm: deepseek/deepseek-v4-flash-0731
-  llm: openai/gpt-5-mini
+  llm: deepseek/deepseek-v4-flash-0731
+  # llm: openai/gpt-5-mini
+  # llm: gpt-5-mini
   embedding_model: text-embedding-3-large
   embedding_dimensions: 3072
   chunk_size: 270
@@ -10,9 +11,10 @@ rag_app:
   tokenizer_encoding: o200k_base
   collection_name: rag_demo
   search_type: similarity
-  k: 5
+  k: 3
   contextual_compression: True 
-  compression_llm: openai/gpt-5-mini
+  compression_llm: openai/gpt-4o-mini
+  # compression_llm: gpt-5-mini
 
 # golden dataset
 golden_dataset:
@@ -44,8 +46,7 @@ evaluation_dataset:
 
 # evaluation
 evaluation:
-  # judge_llm: deepseek/deepseek-v4-flash-0731
-  judge_llm: openai/gpt-5-mini
+  judge_llm: gpt-5-mini
   async_config:
     throttle_value: 3
     max_concurrent: 5
