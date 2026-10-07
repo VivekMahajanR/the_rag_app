@@ -7,7 +7,7 @@ rag_app:
   embedding_model: text-embedding-3-large
   embedding_dimensions: 3072
   chunk_size: 270
-  chunk_overlap: 30
+  chunk_overlap: 25
   tokenizer_encoding: o200k_base
   collection_name: rag_demo
   search_type: similarity

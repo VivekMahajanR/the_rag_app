@@ -176,12 +176,14 @@ if __name__ == "__main__":
         logger.info("code files logged")
 
         # set tag for the run
-        mlflow.set_tag("stage", "baseline")
-        mlflow.set_tag("phase", "noise_threshold")
+        # mlflow.set_tag("stage", "baseline")
+        # mlflow.set_tag("phase", "noise_threshold")
+        mlflow.set_tag("phase", "historical_threshold")
+        
 
         # mark this run as the candidate for the regression / promotion gates
-        # mlflow.set_tag("stage", "challenger")
-        # logger.info("Run tagged stage=challenger")
+        mlflow.set_tag("stage", "challenger")
+        logger.info("Run tagged stage=challenger")
         
     # extract info from run
     run_id = run.info.run_id
