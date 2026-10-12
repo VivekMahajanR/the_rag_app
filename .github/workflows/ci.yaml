@@ -1,0 +1,157 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - params.yaml
+  workflow_dispatch:
+
+
+concurrency:
+  group: ci-pipeline
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  experiments:
+    name: Rebuild vector store & run experiment
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      # dagshub.init() reads this and wires up MLflow auth against DagsHub.
+      DAGSHUB_USER_TOKEN: ${{ secrets.DAGSHUB_USER_TOKEN }}
+      LANGFUSE_PUBLIC_KEY: ${{ secrets.LANGFUSE_PUBLIC_KEY }}
+      LANGFUSE_SECRET_KEY: ${{ secrets.LANGFUSE_SECRET_KEY }}
+      LANGFUSE_BASE_URL: ${{ vars.LANGFUSE_BASE_URL }}
+      # No interactive prompt / phone-home from DeepEval in CI.
+      DEEPEVAL_TELEMETRY_OPT_OUT: "YES"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v7
+        with:
+          python-version-file: ".python-version"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Rebuild vector store against current params.yaml
+        run: uv run src/experiment/ci_rebuild_vector_store.py
+
+      - name: Run experiment Pipeline
+        run: uv run python src/experiment/ci_rebuild_vector_store.py
+
+      - name: Show new challanger run
+        if: success()
+        run: |
+          echo "### New challenger run" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          tail -n 6 historical_runs.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+  regression-test:
+    name: Regression gate
+    needs: experiment
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DAGSHUB_USER_TOKEN: ${{ secrets.DAGSHUB_USER_TOKEN }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up python
+        uses: actions/setup-python@v7
+        with:
+          python-version-file: ".python-version"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Run regression gate
+        id: regression
+        run: uv run pytest tests/test_regression.py python-version-file
+      
+      - name: Reject challanger on regression failure
+        if: always() && steps.regression.outcome == 'failure'
+        run: uv run python src/experiment/reject_challanger.py
+
+  promotion-test:
+    name: Promotion gate
+    needs: regression-test
+    runs-on: ubuntu-latest
+    env:
+      DAGSHUB_USER_TOKEN: ${{ secrets.DAGSHUB_USER_TOKEN }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up python
+        uses: actions/setup-python@v7
+        with:
+          python-version-file: ".python-version"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Run promotion gate
+        id: promotion
+        run: uv run pytest test/test_promotion.py -v
+
+      - name: Reject challanger on promotion failure
+        if: always() && steps.promotion.outcome == 'failure'
+        run: uv run python src/experiment/reject_challanger.py
+
+
+  promote:
+    name: Promote challanger to champion
+    needs: promotion-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DAGSHUB_USER_TOKEN: ${{ secrets.DAGSHUB_USER_TOKEN }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version-file: ".python-version"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Promote challanger
+        run: |
+          echo '### Promotion result' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          uv run python src/experiment/promote_challenger.py | tee -a "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
