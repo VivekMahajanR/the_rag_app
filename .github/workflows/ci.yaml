@@ -63,7 +63,7 @@ jobs:
 
   regression-test:
     name: Regression gate
-    needs: experiment
+    needs: experiments
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
