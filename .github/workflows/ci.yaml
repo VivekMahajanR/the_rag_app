@@ -1,5 +1,13 @@
 name: CI Pipeline
 
+# Full pipeline:
+#   experiment      -> rebuild vector store, run experiment pipeline
+#                      (creates a new MLflow run on DagsHub tagged stage=challenger)
+#   regression-test -> gate the challenger against the champion on thresholds.json
+#   promotion-test  -> majority-vote promotion gate (>= 5/7 metrics >= champion)
+#   promote         -> challenger -> champion, old champion -> archived
+#   both gates auto-reject (clear the stage=challenger tag) on failure.
+
 on:
   push:
     branches: [main]
@@ -7,7 +15,8 @@ on:
       - params.yaml
   workflow_dispatch:
 
-
+# The later stages mutate shared MLflow `stage` tags on DagsHub, so never let
+# two pipeline runs overlap.
 concurrency:
   group: ci-pipeline
   cancel-in-progress: false
@@ -19,6 +28,7 @@ jobs:
   experiments:
     name: Rebuild vector store & run experiment
     runs-on: ubuntu-latest
+    # Eval loop + 7-metric LLM-as-judge over the golden set is long-running.
     timeout-minutes: 60
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -32,15 +42,15 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7 # v7.0.0
 
       - name: "Set up Python"
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@v7 # v7.0.0
         with:
           python-version-file: ".python-version"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           enable-cache: true
 
@@ -51,7 +61,7 @@ jobs:
         run: uv run src/experiment/ci_rebuild_vector_store.py
 
       - name: Run experiment Pipeline
-        run: uv run python src/experiment/ci_rebuild_vector_store.py
+        run: uv run python src/experiment/execute_experiment_pipeline.py
 
       - name: Show new challanger run
         if: success()
@@ -78,7 +88,7 @@ jobs:
           python-version-file: ".python-version"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           enable-cache: true
 
@@ -109,7 +119,7 @@ jobs:
           python-version-file: ".python-version"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           enable-cache: true
 
@@ -142,7 +152,7 @@ jobs:
           python-version-file: ".python-version"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           enable-cache: true
 

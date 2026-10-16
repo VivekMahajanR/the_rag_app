@@ -1464,6 +1464,42 @@ wheels = [
 ]
 
 [[package]]
+name = "guardrails-ai-prompt-injection-detector"
+version = "0.0.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "guardrails-ai" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/10/75/762e2e872c83b8d5ba9b7ee8fafa99dd2a7a2096e8187a2a1049d5153e05/guardrails_ai_prompt_injection_detector-0.0.2.tar.gz", hash = "sha256:93b7b99b4a1b2d56813b2efb9c998b3b53ddc132ed1b3eda1a110f78ba0a2a7a", size = 5682, upload-time = "2026-07-03T19:07:38.936Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cf/14/777b1c3262287c9cfa1f91022cc0cc021043bdf2afb5434e768dd53df0bf/guardrails_ai_prompt_injection_detector-0.0.2-py3-none-any.whl", hash = "sha256:ed30585c1542d171c46e52c499ffa1c1675f37679e04b3576958de7d4a784f01", size = 5551, upload-time = "2026-07-03T19:07:37.658Z" },
+]
+
+[[package]]
+name = "guardrails-ai-reading-time"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "guardrails-ai" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/28/e5/4bae1685edf8fa3f5feb5950df500b0a44bb8a643fe90279614260a6d9ee/guardrails_ai_reading_time-0.1.0.tar.gz", hash = "sha256:2142b64845dddb7c4cb276d3b7b4680e85bda9ef0193d337dbd3033e80bae2a1", size = 4499, upload-time = "2026-07-04T22:46:25.576Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2b/8f/50fdf3923e0cc7a069a15f26b019bb94169df8b069271c647ec50070fdbb/guardrails_ai_reading_time-0.1.0-py3-none-any.whl", hash = "sha256:7ad5f7ab9a338265f9d9181b6b3a241abfd7958007615a4f49738ba09db508e0", size = 3760, upload-time = "2026-07-04T22:46:24.385Z" },
+]
+
+[[package]]
+name = "guardrails-ai-relevancy-evaluator"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "guardrails-ai" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/52/c9/b4f850a3d3c7d5ebd56be178d1994c123e2ed7a1007443982113fb657214/guardrails_ai_relevancy_evaluator-0.1.0.tar.gz", hash = "sha256:2b5606335097ebb86ea8e6d653796c67222f082e90d619aece463df1d6ad4d68", size = 5250, upload-time = "2026-07-05T21:18:53.215Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4e/32/56995ceecf70813455132cf4f6ddda33a951541eeb655d108e24fe8b543c/guardrails_ai_relevancy_evaluator-0.1.0-py3-none-any.whl", hash = "sha256:eb78e400b558898afe443ed6609f6a29ee339e0ec416701114dfd7fc890eceae", size = 5387, upload-time = "2026-07-05T21:18:52.175Z" },
+]
+
+[[package]]
 name = "guardrails-ai-types"
 version = "0.5.0"
 source = { registry = "https://pypi.org/simple" }
@@ -5150,6 +5186,9 @@ dependencies = [
     { name = "chromadb" },
     { name = "deepeval" },
     { name = "guardrails-ai" },
+    { name = "guardrails-ai-prompt-injection-detector" },
+    { name = "guardrails-ai-reading-time" },
+    { name = "guardrails-ai-relevancy-evaluator" },
     { name = "ipykernel" },
     { name = "langchain" },
     { name = "langchain-chroma" },
@@ -5170,6 +5209,9 @@ requires-dist = [
     { name = "chromadb", specifier = ">=1.5.9" },
     { name = "deepeval", specifier = ">=4.2.6" },
     { name = "guardrails-ai", specifier = ">=0.11.0" },
+    { name = "guardrails-ai-prompt-injection-detector", specifier = ">=0.0.2" },
+    { name = "guardrails-ai-reading-time", specifier = ">=0.1.0" },
+    { name = "guardrails-ai-relevancy-evaluator", specifier = ">=0.1.0" },
     { name = "ipykernel", specifier = ">=7.3.0" },
     { name = "langchain", specifier = ">=1.4.2" },
     { name = "langchain-chroma", specifier = ">=1.1.0" },

@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from app.clients import llm
 from app.vector_store import get_retriever
 
-from api.schemas import AppHealthResponse, DependencyHealthResponce
+from api.schemas import AppHealthResponse, DependencyHealthResponse
 
 router = APIRouter(prefix="/health", tags=["health"])
 
@@ -11,8 +11,8 @@ router = APIRouter(prefix="/health", tags=["health"])
 def applicarion_health() -> AppHealthResponse:
     return AppHealthResponse(message="Welcome to campusx chatbot")
 
-@router.get("/dependencies", response_model=DependencyHealthResponce)
-def depedency_health() -> DependencyHealthResponce:
+@router.get("/dependencies", response_model=DependencyHealthResponse)
+def depedency_health() -> DependencyHealthResponse:
     llm_health: str = "healthy"
     llm_error: str | None = None
     try:
@@ -29,7 +29,7 @@ def depedency_health() -> DependencyHealthResponce:
         retriever_health = "Unhealthy"
         retriever_error = str(e)
 
-    return DependencyHealthResponce(
+    return DependencyHealthResponse(
         llm_health= llm_health,
         llm_error= llm_error,
         retriever_health= retriever_health,

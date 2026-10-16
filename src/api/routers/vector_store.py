@@ -17,7 +17,7 @@ from api.security import require_admin_key
 router = APIRouter(
     prefix="/internal/vector-store",
     tags=["vector-store-admin"],
-    dependencies=[Depends[require_admin_key]]
+    dependencies=[Depends(require_admin_key)]
 )
 
 RAW_TRANSCRIPTS_DIR = REPO_ROOT
