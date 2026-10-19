@@ -5318,7 +5318,7 @@ wheels = [
 [[package]]
 name = "the-rag-app"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "chromadb" },
     { name = "dagshub" },
@@ -5340,6 +5340,14 @@ dependencies = [
     { name = "mlflow" },
     { name = "python-dotenv" },
     { name = "streamlit" },
+]
+
+[package.dev-dependencies]
+guardrails = [
+    { name = "guardrails-ai" },
+    { name = "guardrails-ai-prompt-injection-detector" },
+    { name = "guardrails-ai-reading-time" },
+    { name = "guardrails-ai-relevancy-evaluator" },
 ]
 
 [package.metadata]
@@ -5364,6 +5372,14 @@ requires-dist = [
     { name = "mlflow", specifier = ">=3.16.1" },
     { name = "python-dotenv", specifier = ">=1.2.3" },
     { name = "streamlit", specifier = ">=1.64.0" },
+]
+
+[package.metadata.requires-dev]
+guardrails = [
+    { name = "guardrails-ai", specifier = ">=0.10.2" },
+    { name = "guardrails-ai-prompt-injection-detector", specifier = ">=0.0.2" },
+    { name = "guardrails-ai-reading-time", specifier = ">=0.1.0" },
+    { name = "guardrails-ai-relevancy-evaluator", specifier = ">=0.1.0" },
 ]
 
 [[package]]

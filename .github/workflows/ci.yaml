@@ -40,6 +40,10 @@ jobs:
       LANGFUSE_BASE_URL: ${{ vars.LANGFUSE_BASE_URL }}
       # No interactive prompt / phone-home from DeepEval in CI.
       DEEPEVAL_TELEMETRY_OPT_OUT: "YES"
+      # DeepEval default per-attempt timeout (~88s) is too tight for the
+      # 7-metric LLM-as-judge eval; these match the local working overrides.
+      DEEPEVAL_PER_TASK_TIMEOUT_SECONDS_OVERRIDE: "1800"
+      DEEPEVAL_PER_ATTEMPT_TIMEOUT_SECONDS_OVERRIDE: "600"
 
     steps:
       - name: Check out repository
