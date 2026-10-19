@@ -25,7 +25,7 @@ BASE_URL = "http://127.0.0.1:8000"
 HEADERS = {"X-Admin-key": os.environ.get("ADMIN_API_KEY")}
 
 def get_chunk_count() -> int:
-    response=requests.get(f"{BASE_URL}/internal/vector-store/traanscripts/sync", headers=HEADERS)
+    response=requests.get(f"{BASE_URL}/internal/vector-store/chunks/count", headers=HEADERS)
     response.raise_for_status()
     return response.json()["count"]
 

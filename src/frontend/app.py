@@ -8,7 +8,7 @@ import streamlit as st
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 
-from frontend.app_client import check_dependency_health, list_uploaded_files, stresm_chat
+from frontend.app_client import check_dependency_health, list_uploaded_files, stream_chat
 
 load_dotenv()
 

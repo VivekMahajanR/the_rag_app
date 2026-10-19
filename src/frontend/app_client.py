@@ -6,7 +6,7 @@ import requests
 API_BASE_URL = os.environ.get("API_BASE_URL", "http://127.0.0.1:8000")
 
 
-def stresm_chat(query: str) -> Iterator[str]:
+def stream_chat(query: str) -> Iterator[str]:
     with requests.post(
         f"{API_BASE_URL}/chat", json={"query": query}, stream=True
     ) as response:

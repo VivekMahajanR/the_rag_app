@@ -1,3 +1,13 @@
+"""Manual demo: calls POST /chat and prints the response as it streams in.
+
+Not a pytest test (no assertions, needs a live server) -- named `demo_*`
+instead of `test_*` so pytest doesn't try to collect and run it.
+
+Usage:
+    1. Start the API:  uvicorn api.main:app --reload --app-dir src
+    2. Run this file:  python tests/demo_chat_endpoint.py
+"""
+
 import requests
 
 BASE_URL = "http://127.0.0.1:8000"
@@ -19,4 +29,4 @@ def demo_chat_streaming(query: str) -> None:
     print("\n")
 
 if __name__ == "__main__":
-    demo_chat_streaming()
+    demo_chat_streaming(QUERY)
