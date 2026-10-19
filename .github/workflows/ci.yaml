@@ -68,7 +68,7 @@ jobs:
       - name: Run experiment Pipeline
         run: uv run python src/experiment/execute_experiment_pipeline.py
 
-      - name: Show new challanger run
+      - name: Show new challenger run
         if: success()
         run: |
           echo "### New challenger run" >> "$GITHUB_STEP_SUMMARY"
@@ -102,9 +102,9 @@ jobs:
 
       - name: Run regression gate
         id: regression
-        run: uv run pytest tests/test_regression.py python-version-file
+        run: uv run pytest tests/test_regression.py -v
       
-      - name: Reject challanger on regression failure
+      - name: Reject challenger on regression failure
         if: always() && steps.regression.outcome == 'failure'
         run: uv run python src/experiment/reject_challanger.py
 
@@ -133,7 +133,7 @@ jobs:
 
       - name: Run promotion gate
         id: promotion
-        run: uv run pytest test/test_promotion.py -v
+        run: uv run pytest tests/test_promotion.py -v
 
       - name: Reject challanger on promotion failure
         if: always() && steps.promotion.outcome == 'failure'
@@ -141,7 +141,7 @@ jobs:
 
 
   promote:
-    name: Promote challanger to champion
+    name: Promote challenger to champion
     needs: promotion-test
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -164,9 +164,9 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen
 
-      - name: Promote challanger
+      - name: Promote challenger
         run: |
           echo '### Promotion result' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
-          uv run python src/experiment/promote_challenger.py | tee -a "$GITHUB_STEP_SUMMARY"
+          uv run python src/experiment/promote_challanger.py | tee -a "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
