@@ -35,8 +35,8 @@ def save_sessions(sessions_meta: dict) -> None:
 
 
 def persist_chat(session_id: str) -> None:
-    st.session_state.session_meta[session_id]["messages"] = st.session_state.chats[session_id]
-    save_sessions(st.session_state.session_meta)
+    st.session_state.sessions_meta[session_id]["messages"] = st.session_state.chats[session_id]
+    save_sessions(st.session_state.sessions_meta)
 
 
 def generate_session_name(first_message: str) -> str:
@@ -87,7 +87,7 @@ if "sessions_meta" not in st.session_state:
 if "chats" not in st.session_state:
     st.session_state.chats = {
         sid: meta.get("message", [])
-        for sid, meta in st.session_state.session_meta.items()
+        for sid, meta in st.session_state.sessions_meta.items()
     }
 if "health" not in st.session_state:
     st.session_state.health = {
@@ -107,7 +107,7 @@ if "active_session_id" not in st.session_state:
     else:
         st.session_state.active_session_id = create_session()
 
-active_sid = st.session_state.active_sessions_id
+active_sid = st.session_state.active_session_id
 st.session_state.chats.setdefault(active_sid, [])
 
 
@@ -183,7 +183,7 @@ with st.sidebar:
     st.markdown("## 💬 Sessions")
 
     sorted_sessions = sorted(
-        st.session_state.session_meta.values(),
+        st.session_state.sessions_meta.values(),
         key= lambda s: s["created_at"],
         reverse=True
     )
@@ -230,7 +230,7 @@ if prompt := st.chat_input("Ask your doubt…"):
     with st.chat_message("assistant"):
         status = st.status("Generating response…", expanded=False)
         try:
-            response_text = st.write_stream(stream_chat(prompt, active_sid))
+            response_text = st.write_stream(stream_chat(prompt))
             status.update(label="Response generated", state="complete")
         except requests.exceptions.RequestException as e:
             response_text = f"Could not reach the backend: {e}"

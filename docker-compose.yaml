@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.api
       secrets:
-        - openai-api-key
+        - openai_api_key
     image: campusx-rag-api:latest
     ports:
       - "8000:8000"

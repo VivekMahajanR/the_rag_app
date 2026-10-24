@@ -31,5 +31,9 @@ handler.setFormatter(fmt=formatter)
 # shared llm client -- used by the RAG graph's generation step, the vector
 # store's contextual-compression retriever, and the /health dependency check
 # llm = ChatOpenAI(model=app_params.llm, temperature=0)
-llm = ChatOpenRouter(model= app_params.compression_llm,
-                     api_key=os.environ["OPENROUTER_API_KEY"])
+llm = (
+    ChatOpenRouter(model= app_params.compression_llm,
+                     api_key=os.getenv("OPENROUTER_API_KEY"))
+    if os.getenv("OPENROUTER_API_KEY") else None
+    )
+
