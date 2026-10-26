@@ -90,8 +90,8 @@ aws sts get-caller-identity
 ```bash
 sudo apt-get install jq
 aws secretsmanager get-secret-value \
-  --secret-id api-keys \
-  --region ap-south-1 \
+  --secret-id the_rag_app \
+  --region ap-southeast-2 \
   --query SecretString --output text \
   | jq -r 'to_entries[] | "\(.key)=\(.value)"' > /opt/campusx-rag/.env
 chmod 600 /opt/campusx-rag/.env
@@ -111,7 +111,7 @@ Expect: `OPENAI_API_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_PUBLIC_KEY`,
 ## 5. Pull the compose file from S3
 
 ```bash
-aws s3 cp s3://llmops-rag-compose/docker-compose.yml /opt/campusx-rag/docker-compose.yml --region ap-south-1
+aws s3 cp s3://llmops-rag-compose/docker-compose.yml /opt/campusx-rag/docker-compose.yml --region ap-southeast-2
 ```
 
 ---

@@ -209,7 +209,7 @@ set -euxo pipefail
 apt update
 apt install -y wget
 cd /home/ubuntu
-wget https://aws-codedeploy-ap-south-1.s3.ap-south-1.amazonaws.com/latestv2/install
+wget https://aws-codedeploy-ap-southeast-2.s3.ap-southeast-2.amazonaws.com/latestv2/install
 chmod +x ./install
 ./install auto
 systemctl enable --now codedeploy-agent

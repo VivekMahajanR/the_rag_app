@@ -10,9 +10,14 @@ permissions:
   contents: read
 
 env:
-  AWS_REGION: ap-south-2
+  AWS_REGION: ap-southeast-2
   ECR_API_REPOSITORY: campusx-rag-api
   ECR_FRONTEND_REPOSITORY: campusx-rag-frontend
+  # CodeDeploy rollout (see deploy/codedeploy/ and codedeploy_steps.md). These
+  # names are contractual -- the console resources must match them exactly.
+  DEPLOY_BUCKET: campusx-rag-codedeploy-vivek
+  CODEDEPLOY_APP: campusx-rag
+  CODEDEPLOY_GROUP: campusx-rag-dg
 
 jobs:
   build-and-push:
