@@ -111,16 +111,22 @@ Expect: `OPENAI_API_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_PUBLIC_KEY`,
 ## 5. Pull the compose file from S3
 
 ```bash
-aws s3 cp s3://llmops-rag-compose/docker-compose.yml /opt/campusx-rag/docker-compose.yml --region ap-southeast-2
+aws s3 cp s3://llmops-rag-app-manual-instance/docker-compose.yaml /opt/campusx-rag/docker-compose.yaml --region ap-southeast-2
 ```
+read yaml
+---
+```bash
+cat docker-compose.yaml
+```
+---
 
 ---
 
 ## 6. Log in to ECR, pull, and start
 
 ```bash
-aws ecr get-login-password --region ap-south-1 \
-  | sudo docker login --username AWS --password-stdin 891377050051.dkr.ecr.ap-south-1.amazonaws.com
+aws ecr get-login-password --region ap-southeast-2 \
+  | sudo docker login --username AWS --password-stdin 370478231683.dkr.ecr.ap-southeast-2.amazonaws.com
 ```
 
 ```bash

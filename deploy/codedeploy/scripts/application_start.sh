@@ -4,8 +4,8 @@
 # as root.
 set -euo pipefail
 
-REGION=ap-south-1
-ACCOUNT_ID=891377050051
+REGION=ap-southeast-2
+ACCOUNT_ID=370478231683
 SECRET_ID=api-keys
 APP_DIR=/opt/campusx-rag
 APP_USER=ubuntu
