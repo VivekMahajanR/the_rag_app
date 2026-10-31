@@ -6,7 +6,7 @@ set -euo pipefail
 
 APP_DIR=/opt/campusx-rag
 
-[ -f "$APP_DIR/docker-compose.yml" ] || exit 0
+[ -f "$APP_DIR/docker-compose.yaml" ] || exit 0
 
 cd "$APP_DIR"
 docker compose down --rmi all
