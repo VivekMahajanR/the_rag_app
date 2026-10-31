@@ -111,12 +111,12 @@ Expect: `OPENAI_API_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_PUBLIC_KEY`,
 ## 5. Pull the compose file from S3
 
 ```bash
-aws s3 cp s3://llmops-rag-app-manual-instance/docker-compose.yaml /opt/campusx-rag/docker-compose.yaml --region ap-southeast-2
+aws s3 cp s3://llmops-rag-app-manual-instance/docker-compose.yml /opt/campusx-rag/docker-compose.yml --region ap-southeast-2
 ```
-read yaml
+read yml
 ---
 ```bash
-cat docker-compose.yaml
+cat docker-compose.yml
 ```
 ---
 

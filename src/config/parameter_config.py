@@ -5,7 +5,7 @@ from config.config_types import Params
 
 # define the paths
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
-PARAMS_PATH = ROOT_DIR / "params.yaml"
+PARAMS_PATH = ROOT_DIR / "params.yml"
 
 # load the config file
 def load_config(params_path: Path | str):

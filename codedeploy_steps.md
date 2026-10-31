@@ -10,7 +10,7 @@ automatically from the revision in [`deploy/codedeploy/`](deploy/codedeploy/).
   Actions IAM user behind the `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`
   repo secrets.
 - **Resource names below are contractual** — [`deploy/codedeploy/`](deploy/codedeploy/)
-  and [`.github/workflows/cd.yaml`](.github/workflows/cd.yaml) hard-code them. If
+  and [`.github/workflows/cd.yml`](.github/workflows/cd.yml) hard-code them. If
   you change a name, change it in both places.
 
 Architecture:
