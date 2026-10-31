@@ -102,8 +102,8 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p bundle/scripts
-          cp deploy/codedeploy/appspec.yaml bundle/
-          cp deploy/codedeploy/docker-compose.yaml bundle/
+          cp deploy/codedeploy/appspec.yml bundle/
+          cp deploy/codedeploy/docker-compose.yml bundle/
           cp deploy/codedeploy/scripts/*.sh bundle/scripts/
           chmod +x bundle/scripts/*.sh
 

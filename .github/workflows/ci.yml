@@ -12,7 +12,7 @@ on:
   push:
     branches: [main]
     paths:
-      - params.yaml
+      - params.yml
   workflow_dispatch:
 
 # The later stages mutate shared MLflow `stage` tags on DagsHub, so never let
@@ -62,7 +62,7 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen
 
-      - name: Rebuild vector store against current params.yaml
+      - name: Rebuild vector store against current params.yml
         run: uv run src/experiment/ci_rebuild_vector_store.py
 
       - name: Run experiment Pipeline
